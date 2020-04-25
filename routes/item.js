@@ -5,6 +5,6 @@ router.post('/', itemController.cadastrarItem);
 router.get('/', itemController.buscarTodosItens);
 router.get('/:id', itemController.buscarItem);
 router.put('/edit/:id', itemController.atualizarItem);
-router.put('/inactive/:id', itemController.desativarItem);
+router.put('/deactivate/:id', itemController.desativarItem);
 
 module.exports = router;
