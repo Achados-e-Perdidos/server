@@ -18,7 +18,6 @@ app.use(morgan('dev'));
 //Importando Rotas
 const itemRoute = require('./routes/item');
 const loginRoute = require('./routes/login');
-const registerRoute = require('./routes/register');
 
 app.use(
   "/files",
@@ -38,7 +37,6 @@ mongoose.connect(
 //Nomeando as rotas
 app.use('/api/item', itemRoute);
 app.use('/api/login', loginRoute);
-app.use('/api/register', registerRoute);
 
 const port = process.env.PORT;
 
