@@ -5,13 +5,11 @@ exports.cadastrarItem = async (req, res) => {
     
     const body = req.body;
 
-    let dateSplit = body.dataAchadoPerdido.split('/'); 
-
     const newItem = new Item({
         titulo: body.titulo,
         categoria: body.categoria,
         descricao: body.descricao,
-        dataAchadoPerdido: new Date(`${dateSplit[1]}-${dateSplit[0]}-${dateSplit[2]}`),
+        dataAchadoPerdido: body.dataAchadoPerdido,
         imagens: body.imagens
     });
 
