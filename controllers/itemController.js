@@ -1,18 +1,23 @@
 const User = require('../models/User');
 const Item = require('../models/Item');
 
-exports.cadastrarItem = async (req, res) => {
+exports.cadastrarItem = async (req, res, next) => {
     
-    const body = req.body;
+    const { dataAchadoPerdido, titulo, categoria, descricao } = req.body;
+    const imagens = [];
 
-    let dateSplit = body.dataAchadoPerdido.split('/'); 
+    req.files.map((file, index) => {
+        imagens.push(`${process.env.HOST}:${process.env.PORT}/files/${file.filename}`)
+    })
+
+    let dateSplit = dataAchadoPerdido.split('/'); 
 
     const newItem = new Item({
-        titulo: body.titulo,
-        categoria: body.categoria,
-        descricao: body.descricao,
+        titulo: titulo,
+        categoria: categoria,
+        descricao: descricao,
         dataAchadoPerdido: new Date(`${dateSplit[1]}-${dateSplit[0]}-${dateSplit[2]}`),
-        imagens: body.imagens
+        imagens: imagens
     });
 
     try {

@@ -2,6 +2,7 @@ const multer = require("multer");
 const path = require("path");
 const aws = require("aws-sdk");
 const multerS3 = require("multer-s3");
+const crypto = require("crypto");
 
 const storageTypes = {
   local: multer.diskStorage({
@@ -9,8 +10,13 @@ const storageTypes = {
       cb(null, path.resolve(__dirname, "..", "uploads"));
     },
     filename:  (req, file, cb) => {
-      file.key = `${new Date().getTime()}-${file.originalname}`;
+      crypto.randomBytes(16, (err, hash) => {
+        if (err) cb(err);
+
+        file.key = `${hash.toString("hex")}-${new Date().getTime()}-${file.originalname}`;
+
         cb(null, file.key);
+      });
     }
   }),
   s3: multerS3({
@@ -19,8 +25,13 @@ const storageTypes = {
     contentType: multerS3.AUTO_CONTENT_TYPE,
     acl: "public-read",
     key: (req, file, cb) => {
-        const fileName = `${new Date().getTime()}-${file.originalname}`;
+      crypto.randomBytes(16, (err, hash) => {
+        if (err) cb(err);
+
+        const fileName = `${hash.toString("hex")}-${new Date().getTime()}-${file.originalname}`;
+
         cb(null, fileName);
+      });
     }
   })
 };
@@ -33,10 +44,10 @@ module.exports = {
   },
   fileFilter: (req, file, cb) => {
     const allowedMimes = [
-        'image/jpeg',
-        'image/pjpeg',
-        'image/jpg',
-        'image/png',
+      'image/jpeg',
+      'image/pjpeg',
+      'image/jpg',
+      'image/png',
     ];
 
     if (allowedMimes.includes(file.mimetype)) {
