@@ -2,7 +2,6 @@ const User = require('../models/User');
 const Item = require('../models/Item');
 
 exports.cadastrarItem = async (req, res, next) => {
-    
     const { dataAchadoPerdido, titulo, categoria, descricao } = req.body;
     const imagens = [];
 
@@ -10,13 +9,11 @@ exports.cadastrarItem = async (req, res, next) => {
         imagens.push(`${process.env.HOST}:${process.env.PORT}/files/${file.filename}`)
     })
 
-    let dateSplit = dataAchadoPerdido.split('/'); 
-
     const newItem = new Item({
         titulo: titulo,
         categoria: categoria,
         descricao: descricao,
-        dataAchadoPerdido: new Date(`${dateSplit[1]}-${dateSplit[0]}-${dateSplit[2]}`),
+        dataAchadoPerdido: dataAchadoPerdido,
         imagens: imagens
     });
 
@@ -66,10 +63,24 @@ exports.atualizarItem = async (req, res) => {
 
     const body = req.body;
     const itemID = req.params.id;
+    const imagens = [];
+
+    req.files.map((file, index) => {
+        imagens.push(`${process.env.HOST}:${process.env.PORT}/files/${file.filename}`)
+    });
 
     const filter = { _id: itemID };
 
+    console.log(body)
+    console.log(req.files)
+
     try {
+
+        body.imagens = imagens;
+
+        if(req.files === null){
+            body.imagens = [];
+        }
         await Item.findOneAndUpdate(filter, body);
 
         res.status(200).json({"message": "Item Atualizado com sucesso"});
