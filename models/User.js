@@ -2,10 +2,6 @@ const mongoose = require('mongoose');
 const mongooseHidden = require('mongoose-hidden')();
 
 const userSchema = new mongoose.Schema({
-    username: {
-        type: String,
-        required: true
-    },
     name: {
         type: String,
         required: true,
