@@ -11,16 +11,16 @@ exports.registerUser = async (req, res) => {
     
     const {error} = registerValidation(data);
     if(error){
-        return res.status(400).send(error.details[0].message);
+        return res.status(404).send(error.details[0].message);
     }
 
     if(data.password !== data.confirmPassword){
-        res.status(400).json({"message": "Senhas não conferem"});
+        res.status(201).json({"message": "Senhas não conferem"});
     }
 
     const emailExist = await User.findOne({email: data.email});
     if(emailExist) {
-        return res.status(400).json({"message": "Email já registrado"});
+        return res.status(201).send({"message": "Email já registrado"});
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -39,7 +39,7 @@ exports.registerUser = async (req, res) => {
         const token = tokenController.generateToken(savedUser);
         res.status(200).json({"token": token});
     } catch (err){
-        res.status(400).json({"message": "Erro ao registrar usaurio"});
+        res.status(201).send({"message": "Erro ao registrar usaurio"});
     }
 
 }

@@ -9,12 +9,15 @@ exports.cadastrarItem = async (req, res, next) => {
         imagens.push(`${process.env.HOST}:${process.env.PORT}/files/${file.filename}`)
     })
 
+    console.log(req.user._id)
+
     const newItem = new Item({
         titulo: titulo,
         categoria: categoria,
         descricao: descricao,
         dataAchadoPerdido: dataAchadoPerdido,
-        imagens: imagens
+        imagens: imagens, 
+        user: req.user._id
     });
 
     try {
@@ -29,9 +32,7 @@ exports.cadastrarItem = async (req, res, next) => {
 exports.buscarTodosItens = async (req, res) => {
 
     try {
-
         const itens = await Item.find({isAtivo: true}).sort({createAt: 'desc'}).exec();
-
         res.status(200).json({
             data: itens,
         });
@@ -44,15 +45,36 @@ exports.buscarTodosItens = async (req, res) => {
 
 exports.buscarItem = async (req, res) => {
 
+    const requestURL = req.headers.referer.split('/')
+
+    let isEdit = false;
+    if(requestURL.indexOf('edit') != -1){
+        isEdit = true;
+    }
+
     const itemID = req.params.id;
 
     try {
 
-        const itens = await Item.findOne({_id: itemID}).exec();
+        const item = await Item.findOne({_id: itemID}).exec();
 
-        res.status(200).json({
-            data: itens,
-        });
+        if(isEdit){
+            if(item.user === req.user._id){
+                res.status(200).json({
+                    data: item,
+                });
+            } else {
+                res.status(403).send({
+                    message: 'Você não tem acesso a esse item',
+                });
+            }
+        } else {
+            res.status(200).json({
+                data: item,
+            });
+        }
+
+        
 
     } catch (err){
         res.status(400).send({"message": "Erro ao buscar item"});
@@ -71,9 +93,6 @@ exports.atualizarItem = async (req, res) => {
 
     const filter = { _id: itemID };
 
-    console.log(body)
-    console.log(req.files)
-
     try {
 
         body.imagens = imagens;
@@ -81,6 +100,7 @@ exports.atualizarItem = async (req, res) => {
         if(req.files === null){
             body.imagens = [];
         }
+
         await Item.findOneAndUpdate(filter, body);
 
         res.status(200).json({"message": "Item Atualizado com sucesso"});

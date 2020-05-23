@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+var Schema = mongoose.Schema;
 
 const ItemSchema = new mongoose.Schema({
     titulo: {
@@ -29,7 +30,21 @@ const ItemSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
         required: true
+    },
+    user: {
+        type: Schema.Types.ObjectId,
+        required: true,
+        ref: 'User'
     }
 });
+
+ItemSchema.virtual('_user', {
+    ref: 'User', // The model to use
+    localField: 'user', // Find people where `localField`
+    foreignField: 'id', // is equal to `foreignField`
+    // If `justOne` is true, 'members' will be a single doc as opposed to
+    // an array. `justOne` is false by default.
+    justOne: true,
+  });
 
 module.exports = mongoose.model('Item', ItemSchema)
