@@ -2,17 +2,16 @@ const User = require('../models/User');
 const Item = require('../models/Item');
 
 exports.cadastrarItem = async (req, res, next) => {
-    const { dataAchadoPerdido, titulo, categoria, descricao } = req.body;
+    const { dataAchadoPerdido, titulo, categoria, descricao, tipo } = req.body;
     const imagens = [];
 
     req.files.map((file, index) => {
         imagens.push(`${process.env.HOST}:${process.env.PORT}/files/${file.filename}`)
     })
 
-    console.log(req.user._id)
-
     const newItem = new Item({
         titulo: titulo,
+        tipo: tipo,
         categoria: categoria,
         descricao: descricao,
         dataAchadoPerdido: dataAchadoPerdido,
@@ -32,10 +31,13 @@ exports.cadastrarItem = async (req, res, next) => {
 exports.buscarTodosItens = async (req, res) => {
 
     try {
-        const itens = await Item.find({isAtivo: true}).sort({createAt: 'desc'}).exec();
-        res.status(200).json({
-            data: itens,
-        });
+        let itens = await Item.find({isAtivo: true}).sort({createAt: 'desc'}).exec();
+        for (const [idx, item] of itens.entries()) {
+            const user = await User.findById(item.user);
+            item.user = user;
+        }
+
+        res.status(200).json({data: itens});
 
     } catch (err){
         res.status(400).send({"message": "Erro ao buscar itens"});
@@ -57,6 +59,7 @@ exports.buscarItem = async (req, res) => {
     try {
 
         const item = await Item.findOne({_id: itemID}).exec();
+        item.user = await User.findById(item.user);
 
         if(isEdit){
             if(item.user === req.user._id){
