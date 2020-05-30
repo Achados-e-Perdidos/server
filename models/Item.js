@@ -39,6 +39,9 @@ const ItemSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         required: true,
         ref: 'User'
+    },
+    owner: {
+        type: Boolean
     }
 });
 
