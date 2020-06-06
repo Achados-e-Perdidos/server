@@ -74,13 +74,15 @@ exports.atualizarItem = async (req, res) => {
     const body = req.body;
     const itemID = req.params.id;
     const imagens = [];
-    req.files.map((file, index) => {
-        imagens.push(`${process.env.HOST}:${process.env.PORT}/files/${file.filename}`)
-    });
+    if(req.files.length){
+        req.files.map((file, index) => {
+            imagens.push(`${process.env.HOST}:${process.env.PORT}/files/${file.filename}`)
+        });
+        body.imagens = imagens;
+    }
     const filter = { _id: itemID };
     try {
-        body.imagens = imagens;
-        if(req.files === null){
+        if(req.files === undefined){
             body.imagens = [];
         }
         await Item.findOneAndUpdate(filter, body);
