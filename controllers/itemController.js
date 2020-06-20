@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const Item = require('../models/Item');
 
-exports.cadastrarItem = async (req, res, next) => {
+exports.cadastrarItem = async (req, res) => {
     const { dataAchadoPerdido, titulo, categoria, descricao, tipo } = req.body;
     const imagens = [];
     req.files.map((file, index) => {

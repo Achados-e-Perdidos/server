@@ -45,4 +45,6 @@ const ItemSchema = new mongoose.Schema({
     }
 });
 
+ItemSchema.index({'$**': 'text'});
+
 module.exports = mongoose.model('Item', ItemSchema)

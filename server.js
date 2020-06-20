@@ -19,6 +19,7 @@ app.use(morgan('dev'));
 const itemRoute = require('./routes/item');
 const loginRoute = require('./routes/login');
 const userRoute = require('./routes/user');
+const searchRoute = require('./routes/search');
 
 app.use(
   "/files",
@@ -31,17 +32,18 @@ mongoose.connect(
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useFindAndModify: false
-  }, () => 
-  console.log("Connect DB!!!")
-);
+});
+
+mongoose.set('useCreateIndex', true);
 
 //Nomeando as rotas
 app.use('/api/item', itemRoute);
 app.use('/api/login', loginRoute);
 app.use('/api/user', userRoute);
+app.use('/api/search', searchRoute);
 
 const port = process.env.PORT;
 
 app.listen(port, function () {
-  console.log(`Listening on port ${port}!`);
+  console.log(`http://localhost:${port}`);
 });
