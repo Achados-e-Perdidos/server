@@ -1,14 +1,21 @@
 const Item = require('../models/Item');
+const User = require('../models/User');
 
 exports.buscaPorTexto = async (req, res) => {
     let query = req.query.query;
     if(!query){
-        res.status(203).send({"message": "Sem parametros"});
+        res.status(203).send([{"message": "Sem parametros"}]);
     }
-
+    
     try {
         let itens = await Item.find({$text: {$search: query}});
-        console.log(itens)
+        for (const [idx, item] of itens.entries()) {
+            const user = await User.findById(item.user);
+            item.user = user;
+            if(req.user._id == user._id){
+                item.owner = true;
+            }
+        }
         res.status(200).json(itens);
     } catch (err){
         res.status(400).send({"message": "Erro ao buscar itens"});
@@ -24,7 +31,7 @@ exports.buscaAvancada = async (req, res) => {
     let dataFim = req.query.dataFim;
 
     if(!palavrasChave && !tipo && !categoria && !dataInicio && !dataFim){
-        return res.status(203).send({"message": "Sem parametros"});
+        return res.status(203).send([{"message": "Sem parametros"}]);
     }
 
     let options = {};
@@ -46,6 +53,13 @@ exports.buscaAvancada = async (req, res) => {
 
     try {
         let itens = await Item.find(options);
+        for (const [idx, item] of itens.entries()) {
+            const user = await User.findById(item.user);
+            item.user = user;
+            if(req.user._id == user._id){
+                item.owner = true;
+            }
+        }
         res.status(200).json(itens);
     } catch (err){
         return res.status(400).send({"message": "Erro ao buscar itens"});
